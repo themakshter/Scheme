@@ -1,0 +1,8 @@
+#lang racket
+
+(define tree-label car)
+(define tree-children cdr)
+
+(define spanning-tree
+  (lambda (tree)
+    

@@ -1,0 +1,57 @@
+;;; Coursework 2
+;;; Question 2: all-derivation-chains.scm
+;;; Name: Mohammad Ali Khan
+;;; Email: mak1g11@soton.ac.uk
+
+;;; Solution:
+
+(define successors 
+  (lambda (entity graph)
+    (find-successors entity (filter graph))))
+
+(define find-successors
+  (lambda (e l)
+    (cond((null? l) '())
+    ((equal? (derivation-src (car l)) e)
+     (cons (car l) (find-successors e (cdr l))))
+    (else (find-successors e (cdr l))))))
+
+(define filter
+ (lambda (l)
+  (cond ((null? l) '())
+        ((equal? 'wasDerivedFrom (caar l))
+        (cons (car l)
+        (filter (cdr l))))
+        (else (filter (cdr l))))))
+
+(define statement-id cadr)
+(define derivation-src caddr)
+(define derivation-dst cadddr)
+
+(define all-derivation-chains
+  (lambda (entity graph)
+    (if (null? (successors entity graph)) '()
+    (derivation-chains (successors entity graph) '() graph))))
+
+(define derivation-chains 
+  (lambda (sc l g)
+    (cond ((null? sc) (list l))
+          ((null? (cdr sc)) (one-derivation-chain (car sc) l g))
+          (else (append (one-derivation-chain (car sc) l g) 
+                        (derivation-chains (cdr sc) l g))))))
+
+(define one-derivation-chain
+  (lambda (sc l g)
+    (derivation-chains (successors (derivation-dst sc) g) 
+                       (append l (list (statement-id sc))) 
+                       g)))
+
+;;; This was a bit tricky to do, especially keeping track 
+;;; of the different branching offs. Therefore, I created
+;;; two functions to help me manage this. One function 
+;;; handles when the successors are more than one and the 
+;;; other one handles only one successor. In the main 
+;;; function, I pass an empty list to the derivation-chains
+;;; function which will contain all the derivation chains 
+;;; which are added as the function works on. This list is 
+;;; also passed to the other function to share the data.

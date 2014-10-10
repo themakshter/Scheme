@@ -1,0 +1,40 @@
+(define graph1
+  '((entity e0)
+    (entity e1)
+    (entity e2)
+    (entity e3)
+    (entity e4)
+    (entity e5)
+    (wasDerivedFrom d0 e1 e0)
+    (wasDerivedFrom d1 e2 e1)
+    (wasDerivedFrom d2 e3 e2)
+    (wasDerivedFrom d4 e4 e5)
+    (wasDerivedFrom d3 e4 e3)
+    (wasDerivedFrom d5 e5 e0)))
+
+
+(define filter
+(lambda (l)
+(cond ((null? l) '())
+((equal? 'wasDerivedFrom (caar l))
+(cons (car l)
+(filter (cdr l))))
+(else (filter (cdr l))))))
+
+
+(define statement-id cadr)
+(define derivation-src caddr)
+(define derivation-dst cadddr)
+
+(define successors 
+  (lambda (entity graph)
+    (helper entity (filter graph))))
+
+(define helper
+  (lambda (e l)
+    (cond((null? l) '())
+    ((equal? (derivation-src (car l)) e)
+     (cons (car l) (helper e (cdr l))))
+    (else (helper e (cdr l))))))
+
+(successors 'e4 graph1)
